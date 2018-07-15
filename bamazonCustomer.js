@@ -14,37 +14,80 @@ var sqlQuery = "";
 
 connection.connect(function (err) {
     if (err) throw err;
-    // console.log("connected as id " + connection.threadId + "\n");
+    // load items for sale
     itemsForSale()
+    //prompt customer purchase
+
 });
 
 function itemsForSale() {
-    sqlQuery = "SELECT item_id, product_name, price FROM products"
+    sqlQuery = "SELECT * FROM products"
     connection.query(sqlQuery, function (err, res) {
         if (err) throw err;
-        // for (var i = 0; i < res.length; i++) {
-        // console.log( res[i].item_id + " | Product Name: " + res[i].product_name + " | Price: $" + res[i].price) 
-
-        // console.log("-----------------------------------------------------------------");
-        console.log();
         console.log("Items for sale");
-        console.log();
-        // console.table(res);
 
-        let cols = [];
-        for (let i in res[0]) {
-            cols.push(i);
-        };
-
-        console.log(cols.join(" | "));
-        console.log("------------------------")
-        res.forEach(row => {
-            let rowValues = [];
-            cols.forEach(col => {
-                rowValues.push(row[col]);
-            });
-            connection.end();
-            console.log(rowValues.join(' | '));
-            });
+        var resultArray = res.map(obj => {
+            var onSale = {};
+            onSale.item_id = obj.item_id;
+            onSale.product_name = obj.product_name;
+            onSale.price = obj.price;
+            return onSale;
         });
-    }
+        console.table(resultArray)
+
+        inquirer
+            .prompt([
+                {
+                    name: "item_id",
+                    type: "input",
+                    message: "What is the item ID of the product you'd like?"
+                },
+                {
+                    name: "stock_quantity",
+                    type: "input",
+                    message: "How many units would you like?"
+                },
+            ])
+            .then(function (answer) {
+                var chosenID = parseInt(answer.item_id)
+                var quantity = parseInt(answer.stock_quantity)
+                for (var i = 0; i < res.length; i++) {
+                    if (res[i].item_id === chosenID) {
+                        selected = res[i];
+                    }
+                };
+
+                if (selected.stock_quantity >= quantity) {
+                    var updateQuantity = selected.stock_quantity - quantity;
+                    console.log(updateQuantity);
+                    connection.query(
+                        "UPDATE products SET ? WHERE ?",
+                        [
+                            {
+                                stock_quantity: updateQuantity
+                            },
+                            {
+                                item_id: chosenID
+                            }
+                        ],
+                        function (err) {
+                            if (err) throw err;
+                            var cost = selected.price * quantity;
+                            cost_d = cost.toFixed(2);
+                            console.log("Your total is $ " + cost_d)
+                        }
+                    );
+                }
+                else {
+                    console.log("Insufficient quantity!")
+                }
+                connection.end();
+            });
+    })
+}
+
+
+
+
+
+
