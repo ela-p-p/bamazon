@@ -16,7 +16,7 @@ connection.connect(function (err) {
     if (err) throw err;
     console.log("connected")
     menuOptions()
-    deleteProduct()
+
 });
 var choiceArray = ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"];
 function menuOptions() {
@@ -60,8 +60,8 @@ function viewProducts() {
             return table;
         });
         console.table(resultArray)
-        connection.end()
     });
+
 }
 
 function viewLowInventory() {
@@ -69,11 +69,10 @@ function viewLowInventory() {
     connection.query(sqlQuery, function (err, res) {
         if (err) throw err;
         console.table(res);
-        connection.end()
     });
 }
-var productArray = ["Whiskas", "Scratching Post", "Faux Diamond Studded Collar", "Lint Roller", "Zap: Pet stain remover", "Furniture Cover", "'Caturday' logo: Women's t-shirt", "'Space Cat' logo: Men's Hoodie", "Febreeze: Air Freshener", "Dirt Devil: handheld vacuum"]
 
+var productArray = ["Whiskas", "Scratching Post", "Faux Diamond Studded Collar", "Lint Roller", "Zap: Pet stain remover", "Furniture Cover", "'Caturday' logo: Women's t-shirt", "'Space Cat' logo: Men's Hoodie", "Febreeze: Air Freshener", "Dirt Devil: handheld vacuum"]
 function addInventory() {
     sqlQuery = "SELECT * FROM products"
     connection.query(sqlQuery, function (err, res) {
@@ -132,7 +131,7 @@ function addInventory() {
                         function (err) {
                             if (err) throw err;
                             console.log();
-                            console.log(updateQuantity + " units of " + updateStock + " were added to inventory");
+                            console.log(updateStock + " units of " + updateProduct + " were added to inventory");
                         }
                     );
                 }
@@ -180,8 +179,8 @@ function addProduct() {
                     stock_quantity: answer.stock_quantity
                 },
                 function (err) {
-                    if (err) throw err; 
-                    var newItem = answer.stock_quantity + " units of " + answer.product_name + " at " + answer.price + " were added to the " + answer.department_name + ' department.'
+                    if (err) throw err;
+                    var newItem = answer.stock_quantity + " units of " + answer.product_name + " at $" + answer.price + " were added to the " + answer.department_name + ' department.'
                     console.log()
                     console.log(newItem);
                     connection.end()

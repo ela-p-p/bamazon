@@ -59,7 +59,6 @@ function itemsForSale() {
 
                 if (selected.stock_quantity >= quantity) {
                     var updateQuantity = selected.stock_quantity - quantity;
-                    console.log(updateQuantity);
                     connection.query(
                         "UPDATE products SET ? WHERE ?",
                         [
